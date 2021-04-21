@@ -9,7 +9,10 @@ class BasicAgent(AutoAgent):
     Executes the basic coloring agent as described by Dr Cowan
     """
 
-    def __init__(self, img: Image):
-        super().__init__(img)
+    def __init__(self, img: Image, numColors=5):
+        super().__init__(img, numColors)
 
-    # TODO
+    def execute(self):
+        rightWidth, rightLen = self.rightHalf.size
+        rgb_rightHalf = self.rightHalf.convert("RGB")
+        pass
