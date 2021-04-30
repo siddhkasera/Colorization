@@ -9,6 +9,7 @@ if not filePath:
     print("No file detected")
     sys.exit()
 
+
 numColors = input("How many colors do you want to use? (standard is 5) ")
 if not numColors.isnumeric():
     print("No numeric value recognized, using the default 5")

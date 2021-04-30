@@ -1,10 +1,35 @@
 import math
 
+import PIL
 import numpy as np
 import matplotlib as plt
 from sklearn.cluster import KMeans
 from PIL import Image, ImageOps
 import cv2
+from scipy.spatial.distance import cdist
+
+
+def kMeans(x, k, no_iter):
+    idX = np.random.choice(len(x), k, replace=False)
+
+    centroids = x[idX, :]
+
+    distances = cdist(x, centroids, "euclidean")
+
+    points = np.array([np.argmin(i) for i in distances])
+
+    for _ in range(no_iter):  # underscore in this context means to ignore value of specific location
+        centroids = []
+        for idX in range(k):
+            temp_cent = x[points == idX].mean(axis=0)
+            centroids.append(temp_cent)
+
+        centroids = np.vstack(centroids)
+
+        distances = cdist(x, centroids, "euclidean")
+        points = np.array([np.argmin(i) for i in distances])
+
+    return points
 
 
 ###########################################################
@@ -78,11 +103,19 @@ class AutoAgent:
         # self.leftHalf.show()
         # self.rightHalf.show()
 
-        self.grayLeftHalf = ImageOps.grayscale(self.leftHalf)
-        self.grayRightHalf = ImageOps.grayscale(self.rightHalf)
-
         self.recolorLeftHalf = self.recolorLeftHalf()
         self.recolorRightHalf = self.execute()
+
+        result = PIL.Image.new(self.img.mode, self.img.size)
+        pixelMap = result.load()
+        for i in range(result.size[0]):
+            for j in range(result.size[1]):
+                if i < width / 2:
+                    pixelMap[i, j] = self.leftHalf.getPixel(i, j)
+                else:
+                    pixelMap[i, j] = self.rightHalf.getPixel(i, j)
+
+        result.show()
 
     def KMeansFunction(self, numColors=5):
         """
@@ -107,7 +140,7 @@ class AutoAgent:
         colorList = get5LeadingColors(hist, model.cluster_centers_)
 
         # Display the RGB values of the 5 most frequent colors
-        print("Here are the RGB values of the colors:")
+        print("\nHere are the RGB values of the colors:")
         for i in colorList:
             print(i)
 
